@@ -1,0 +1,25 @@
+CREATE TABLE ShopEntity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    amount INTEGER NOT NULL,
+    price REAL NOT NULL,
+    imageUrl TEXT
+);
+
+insertOrReplaceShoppingItem:
+INSERT OR REPLACE
+INTO ShopEntity
+VALUES (? ,? ,? ,? ,?);
+
+deleteShoppingItem:
+DELETE
+FROM ShopEntity
+WHERE id = ?;
+
+selectAllShoppingItems:
+SELECT *
+FROM ShopEntity;
+
+selectTotalPrice:
+SELECT SUM(price * amount)
+FROM ShopEntity;
