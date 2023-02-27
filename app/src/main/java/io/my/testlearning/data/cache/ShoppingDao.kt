@@ -28,6 +28,8 @@ interface ShoppingDao {
 
     suspend fun deleteShoppingItem(entityId: Long)
 
+    suspend fun addImageUrlById(id: Long, url: String)
+
     fun observeAllShoppingItems(): Flow<List<ShopEntity>>
 
     fun observeTotalPrice(): Flow<Double>
@@ -51,6 +53,10 @@ private class ShoppingDaoImpl(
 
     override suspend fun deleteShoppingItem(entityId: Long) {
         queries.deleteShoppingItem(entityId)
+    }
+
+    override suspend fun addImageUrlById(id: Long, url: String) {
+        queries.updateImageUrlShoppingItem(url, id)
     }
 
     override fun observeAllShoppingItems(): Flow<List<ShopEntity>> =

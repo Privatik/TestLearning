@@ -1,23 +1,20 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package io.my.testlearning.ui.presenter
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import io.my.testlearning.MainCoroutineRule
 import io.my.testlearning.ShopEntity
-import io.my.testlearning.data.cache.FakeShoppingRepositoryImpl
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
+import io.my.testlearning.awaitTerminateFlow
+import io.my.testlearning.di.DaggerTestAppComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import kotlin.properties.Delegates
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingPresenterTest{
 
     private val shopItems = listOf(
@@ -33,30 +30,88 @@ class ShoppingPresenterTest{
 
     @Before
     fun setUp(){
-        presenter = ShoppingPresenter(FakeShoppingRepositoryImpl(mainDispatcherRule.dispatcher))
+        val component = DaggerTestAppComponent.builder().build()
+        presenter = component.factory().create(ShoppingPresenter::class.java)
         state = presenter.state
     }
 
     @Test
-    fun totalPrice_return6() = runTest {
-        shopItems.forEach {
-            it.addItem()
+    fun totalPrice_return6() = runTest(mainDispatcherRule.dispatcher) {
+        launch {
+            shopItems.forEach {
+                it.addItem()
+            }
         }
+
+        state.awaitTerminateFlow()
 
         assertThat(state.value.totalPrice).isEqualTo(6.0)
     }
 
     @Test
-    fun totalPrice_return0() = runTest {
-        shopItems.forEach {
-            it.addItem()
+    fun totalPrice_return0() = runTest(mainDispatcherRule.dispatcher) {
+        launch {
+            shopItems.forEach {
+                it.addItem()
+            }
         }
 
-        shopItems.forEach {
-            presenter.intent.removeItem(it.id)
+        launch {
+            shopItems.forEach {
+                presenter.intent.removeItem(it.id)
+            }
         }
+
+        state.awaitTerminateFlow()
 
         assertThat(state.value.totalPrice).isEqualTo(0.0)
+    }
+
+    @Test
+    fun addItemAndUpdateImage() = runTest(mainDispatcherRule.dispatcher) {
+        launch {
+            shopItems[0].addItem()
+        }
+
+        state.awaitTerminateFlow()
+
+        launch {
+            presenter.intent.searchImages("logo")
+        }
+
+        state.awaitTerminateFlow()
+
+        launch {
+            presenter.intent.saveImage(
+                state.value.items.first { it.id == 1L }.id to state.value.images[0]
+            )
+        }
+
+        state.awaitTerminateFlow()
+
+        assertThat(state.value.items.first { it.id == 1L }.imageUrl).contains("logo")
+    }
+
+    @Test
+    fun doRequest_returnEmpty() = runTest(mainDispatcherRule.dispatcher) {
+        launch {
+            presenter.intent.searchImages("")
+        }
+
+        state.awaitTerminateFlow()
+
+        assertThat(state.value.images).isEmpty()
+    }
+
+    @Test
+    fun doRequest_returnLogoUrl() = runTest(mainDispatcherRule.dispatcher) {
+        launch {
+            presenter.intent.searchImages("logo")
+        }
+
+        state.awaitTerminateFlow()
+
+        assertThat(state.value.images[0]).contains("logo")
     }
 
     private fun ShopEntity.addItem(){

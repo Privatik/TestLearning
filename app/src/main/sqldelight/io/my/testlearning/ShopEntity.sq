@@ -11,6 +11,11 @@ INSERT OR REPLACE
 INTO ShopEntity
 VALUES (? ,? ,? ,? ,?);
 
+updateImageUrlShoppingItem:
+UPDATE ShopEntity
+SET imageUrl = ?
+WHERE id = ?;
+
 deleteShoppingItem:
 DELETE
 FROM ShopEntity

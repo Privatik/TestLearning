@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TestLearning</string>
+    <string name="name_product">Наименование продукта</string>
 </resources>

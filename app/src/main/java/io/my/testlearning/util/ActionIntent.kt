@@ -46,7 +46,7 @@ class IntentWithParams<P: Any>(
 
     operator fun invoke(params: P) {
         coroutineScope.launch{
-//            Log.d("DoActionIntent","intent $tag")
+            println("DoActionIntent intent $tag")
             _data.emit(params)
         }
     }

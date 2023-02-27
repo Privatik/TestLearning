@@ -1,5 +1,10 @@
 package io.my.testlearning.data.remote
 
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.window.PopupPositionProvider
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.my.testlearning.BASE_API
@@ -31,8 +36,9 @@ private class ShoppingApiImpl(
             urlString = "$BASE_API$GET_IMAGE"
         ) {
             url.parameters.apply {
-                append("q",query)
                 append("key", BuildConfig.API_KEY)
+                append("q",query)
+                append("per_page",50.toString())
             }
         }
 }

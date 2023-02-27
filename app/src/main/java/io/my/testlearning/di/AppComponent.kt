@@ -12,7 +12,8 @@ import javax.inject.Singleton
         RemoteModule::class,
         RemoteModule::class,
         RepositoryModule::class,
-        PresenterModule::class
+        PresenterModule::class,
+        CoroutineModule::class
     ]
 )
 @Singleton
