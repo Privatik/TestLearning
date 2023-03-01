@@ -24,6 +24,7 @@ class ShoppingPresenter @Inject constructor(
                     payload.name,
                     payload.amount,
                     payload.price,
+                    payload.imageUrl,
                 )
             }
         )
@@ -65,9 +66,6 @@ class ShoppingPresenter @Inject constructor(
 
         onEach(
             flow = intent.searchImages.asFlow(),
-            changeState = { oldState, payload ->
-                oldState.copy(searchQuery = payload)
-            },
             action = { _, _, payload ->
                 repository.searchImagesByQuery(payload)
             },

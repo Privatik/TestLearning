@@ -18,12 +18,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.my.testlearning.data.dto.ShoppingItemDto
 import io.my.testlearning.ui.theme.Purple700
 import io.my.testlearning.ui.theme.TestLearningTheme
 import io.my.testlearning.util.PictureItem
+import io.my.testlearning.util.TestTags
 
 @Composable
 fun ShoppingItems(
@@ -33,21 +36,6 @@ fun ShoppingItems(
 ){
     val price = remember(totalPrice.value) { String.format("%.2f", totalPrice.value) }
 
-    val list = remember {
-        val item = ShoppingItemDto(
-            id = 1L,
-            name = "Bananas",
-            amount = 6,
-            price = 0.25,
-            imageUrl = null
-        )
-
-
-        buildList {
-            repeat(100) { add(item) }
-        }
-    }
-
     Column(
         modifier = modifier
     ) {
@@ -55,7 +43,7 @@ fun ShoppingItems(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(10.dp)
         ) {
-            itemsIndexed(list){ index, item ->
+            items(shoppingItems.value){ item ->
                 ShoppingItem(
                     modifier = Modifier.fillMaxWidth(),
                     item = item,
@@ -70,7 +58,7 @@ fun ShoppingItems(
                 .background(Purple700, RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp))
                 .padding(20.dp)
         ) {
-            Text(text = price)
+            Text(modifier = Modifier.semantics { testTag = TestTags.sumDisplay }, text = price)
         }
     }
 }

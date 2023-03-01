@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 data class ShoppingState(
     val items: List<ShoppingItemDto> = emptyList(),
     val totalPrice: Double = 0.0,
-    val searchQuery: String = "",
     val isOpenBottomBar: Boolean = false,
     val images: List<String> = emptyList(),
 )
@@ -26,5 +25,6 @@ class ShoppingIntent(coroutineScope: CoroutineScope) : ActionIntent(coroutineSco
         val name: String,
         val amount: Long,
         val price: Double,
+        val imageUrl: String?,
     )
 }

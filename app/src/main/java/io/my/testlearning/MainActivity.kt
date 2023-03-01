@@ -20,22 +20,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.io.navigation.AndroidPresenterStoreOwner
 import com.io.navigation.PresenterCompositionLocalProvider
 import com.io.navigation.presenter
+import io.my.testlearning.ui.presenter.ShoppingIntent
 import io.my.testlearning.ui.presenter.ShoppingPresenter
+import io.my.testlearning.ui.presenter.ShoppingState
 import io.my.testlearning.ui.screens.AddShoppingItem
 import io.my.testlearning.ui.screens.ShoppingItems
 import io.my.testlearning.ui.theme.TestLearningTheme
 import io.my.testlearning.util.BasePresenterAdapter
+import io.my.testlearning.util.TestTags
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val owner = AndroidPresenterStoreOwner<String>(BasePresenterAdapter())
+        val owner = AndroidPresenterStoreOwner(BasePresenterAdapter())
 
         setContent {
             TestLearningTheme {
@@ -51,62 +56,78 @@ class MainActivity : ComponentActivity() {
                     ) {
                         val presenter: ShoppingPresenter = presenter(factory = presenterFactory())
 
-                        val state = presenter.state.collectAsState()
-                        val shoppingItems = remember { derivedStateOf { state.value.items } }
-                        val images = remember { derivedStateOf { state.value.images } }
-                        val totalPrice = remember { derivedStateOf { state.value.totalPrice } }
-                        val searchQuery = remember { derivedStateOf { state.value.searchQuery } }
-                        val isOpenBottomBar by remember { derivedStateOf { state.value.isOpenBottomBar } }
-
-                        BackHandler(enabled = isOpenBottomBar) { presenter.intent.openBottomBar(false) }
-
-                        var heightBottom by remember { mutableStateOf(0) }
-                        val height by animateIntAsState(
-                            targetValue = if (isOpenBottomBar) heightBottom else 0
+                        MainScreen(
+                            state = presenter.state.collectAsState(),
+                            intents = presenter.intent
                         )
-
-                        Box(
-                            modifier = Modifier.onSizeChanged {
-                                if (heightBottom != it.height){
-                                    heightBottom = it.height
-                                }
-                            }
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .offset { IntOffset(0, -height) }
-                                    .fillMaxSize()
-                            ) {
-                                ShoppingItems(
-                                    modifier = Modifier.fillMaxSize(),
-                                    shoppingItems = shoppingItems,
-                                    totalPrice = totalPrice
-                                )
-                                FloatingActionButton(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomEnd)
-                                        .padding(10.dp),
-                                    onClick = { presenter.intent.openBottomBar(true) }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_add),
-                                        tint = Color.White,
-                                        contentDescription = "Add"
-                                    )
-                                }
-                            }
-                            AddShoppingItem(
-                                modifier = Modifier
-                                    .offset { IntOffset(0, heightBottom - height) }
-                                    .fillMaxSize(),
-                                images = images,
-                                searchImages = { presenter.intent.searchImages(it) }
-                            )
-                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MainScreen(
+    state: State<ShoppingState>,
+    intents: ShoppingIntent,
+){
+    val shoppingItems = remember { derivedStateOf { state.value.items } }
+    val images = remember { derivedStateOf { state.value.images } }
+    val totalPrice = remember { derivedStateOf { state.value.totalPrice } }
+    val isOpenBottomBar by remember { derivedStateOf { state.value.isOpenBottomBar } }
+
+    BackHandler(enabled = isOpenBottomBar) { intents.openBottomBar(false) }
+
+    var heightBottom by remember { mutableStateOf(0) }
+    val height by animateIntAsState(
+        targetValue = if (isOpenBottomBar) heightBottom else 0
+    )
+
+    Box(
+        modifier = Modifier.onSizeChanged {
+            if (heightBottom != it.height){
+                heightBottom = it.height
+            }
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(0, -height) }
+                .fillMaxSize()
+                .semantics { testTag = TestTags.showItemsScreen }
+        ) {
+            ShoppingItems(
+                modifier = Modifier.fillMaxSize(),
+                shoppingItems = shoppingItems,
+                totalPrice = totalPrice
+            )
+            FloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(10.dp)
+                    .semantics { testTag = TestTags.addItemTag },
+                onClick = { intents.openBottomBar(true) }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add),
+                    tint = Color.White,
+                    contentDescription = "Add"
+                )
+            }
+        }
+        AddShoppingItem(
+            modifier = Modifier
+                .offset { IntOffset(0, heightBottom - height) }
+                .fillMaxSize()
+                .semantics { testTag = TestTags.addItemScreen },
+            images = images,
+            searchImages = { intents.searchImages(it) },
+            addItem = {
+                intents.addItem(it)
+                intents.openBottomBar(false)
+            }
+        )
     }
 }
 

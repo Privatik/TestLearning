@@ -23,6 +23,7 @@ interface ShoppingRepository {
         name: String,
         amount: Long,
         price: Double,
+        imageUrl: String?,
     )
 
     suspend fun deleteShoppingItemById(id: Long)
@@ -54,14 +55,19 @@ class ShoppingRepositoryImpl @Inject constructor(
     private val _imagesFlow = MutableSharedFlow<List<String>>()
     override val imagesFlow: Flow<List<String>> = _imagesFlow.asSharedFlow()
 
-    override suspend fun insertShoppingItem(name: String, amount: Long, price: Double) =
+    override suspend fun insertShoppingItem(
+        name: String,
+        amount: Long,
+        price: Double,
+        imageUrl: String?
+    ) =
         withContext(dispatcherIO) {
             shoppingDao.insertShoppingItem(
                 id = null,
                 name = name,
                 amount = amount,
                 price = price,
-                imageUrl = null
+                imageUrl = imageUrl
             )
         }
 

@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'io.my.testlearning'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "io.my.testlearning"
         minSdk 24
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -52,6 +52,15 @@ android {
         }
     }
 
+    testOptions {
+        execution "ANDROIDX_TEST_ORCHESTRATOR"
+
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
+    }
+
 }
 
 dependencies {
@@ -64,6 +73,7 @@ dependencies {
     implementation 'androidx.compose.material:material:1.1.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'app.cash.turbine:turbine:0.12.1'
+    androidTestImplementation 'app.cash.turbine:turbine:0.12.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
@@ -76,7 +86,14 @@ dependencies {
     testImplementation "com.google.truth:truth:1.1.3"
     androidTestImplementation "com.google.truth:truth:1.1.3"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
     testImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:4.1.0"
+
+    //kaspresso
+    def kaspressoVersion = "1.5.1"
+    androidTestImplementation "com.kaspersky.android-components:kaspresso:$kaspressoVersion"
+    androidTestImplementation "com.kaspersky.android-components:kaspresso-compose-support:$kaspressoVersion"
 
     //sql
     implementation "com.squareup.sqldelight:android-driver:1.5.2"

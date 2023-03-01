@@ -117,7 +117,7 @@ class ShoppingPresenterTest{
     private fun ShopEntity.addItem(){
         presenter.intent.addItem(
             ShoppingIntent.ShoppingItemInsert(
-                name, amount, price
+                name, amount, price, null
             )
         )
     }
